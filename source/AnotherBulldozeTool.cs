@@ -99,17 +99,17 @@ namespace AnotherBulldoze
                     bulldozeButton.relativePosition.x + bulldozeButton.width / 2.0f - mainButton.width - bulldozeButton.width,
                     bulldozeButton.relativePosition.y + bulldozeButton.height / 2.0f - mainButton.height / 2.0f
                 );
-                if (mode == LoadMode.NewGame || mode == LoadMode.LoadGame)
-                {
-                    mainButton.normalBgSprite = "ZoningOptionMarquee";
-                    mainButton.focusedFgSprite = "ToolbarIconGroup6Focused";
-                    mainButton.hoveredFgSprite = "ToolbarIconGroup6Hovered";
-                }
-                else { 
+                //if (mode == LoadMode.NewGame || mode == LoadMode.LoadGame)
+                //{
+                //    mainButton.normalBgSprite = "ZoningOptionMarquee";
+                //    mainButton.focusedFgSprite = "ToolbarIconGroup6Focused";
+                //    mainButton.hoveredFgSprite = "ToolbarIconGroup6Hovered";
+                //}
+                //else { 
                     mainButton.normalFgSprite = bulldozeButton.normalFgSprite;
                     mainButton.focusedFgSprite = bulldozeButton.focusedFgSprite;
                     mainButton.hoveredFgSprite = bulldozeButton.hoveredFgSprite;
-                }
+                //}
 
                 mainButton.eventClick += buttonClicked;
 
