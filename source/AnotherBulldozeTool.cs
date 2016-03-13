@@ -92,29 +92,27 @@ namespace AnotherBulldoze
 
                 mainButton = bulldozeButton.parent.AddUIComponent<UIButton>();
                 mainButton.name = "MarqueeBulldozer";
-                mainButton.size = new Vector2(42, 42);
+                mainButton.size = new Vector2(36, 36);
                 mainButton.tooltip = "Another Bulldozer";
                 mainButton.relativePosition = new Vector2
                 (
                     bulldozeButton.relativePosition.x + bulldozeButton.width / 2.0f - mainButton.width - bulldozeButton.width,
                     bulldozeButton.relativePosition.y + bulldozeButton.height / 2.0f - mainButton.height / 2.0f
                 );
-                //if (mode == LoadMode.NewGame || mode == LoadMode.LoadGame)
-                //{
-                //    mainButton.normalBgSprite = "ZoningOptionMarquee";
-                //    mainButton.focusedFgSprite = "ToolbarIconGroup6Focused";
-                //    mainButton.hoveredFgSprite = "ToolbarIconGroup6Hovered";
-                //}
-                //else { 
-                    mainButton.normalFgSprite = bulldozeButton.normalFgSprite;
-                    mainButton.focusedFgSprite = bulldozeButton.focusedFgSprite;
-                    mainButton.hoveredFgSprite = bulldozeButton.hoveredFgSprite;
-                //}
+
+                mainButton.normalFgSprite = bulldozeButton.normalFgSprite;
+                mainButton.focusedFgSprite = bulldozeButton.focusedFgSprite;
+                mainButton.hoveredFgSprite = bulldozeButton.hoveredFgSprite;
 
                 mainButton.eventClick += buttonClicked;
 
                 marqueeBulldozePanel = UIView.GetAView().FindUIComponent("TSBar").AddUIComponent<UIPanel>();
-                marqueeBulldozePanel.backgroundSprite = "SubcategoriesPanel";
+
+                if (mode == LoadMode.LoadMap || mode == LoadMode.NewMap)
+                    marqueeBulldozePanel.backgroundSprite = "GenericPanel";
+                else
+                    marqueeBulldozePanel.backgroundSprite = "SubcategoriesPanel";
+
                 marqueeBulldozePanel.isVisible = false;
                 marqueeBulldozePanel.name = "MarqueeBulldozerSettings";
                 marqueeBulldozePanel.size = new Vector2(150, 350);
@@ -190,7 +188,6 @@ namespace AnotherBulldoze
             label.width = 80;
             label.text = text;
         }
-
 
         private void Pipes_Checked(UIComponent component, bool value)
         { Properties.Settings.Default.Pipes = cbPipes.isChecked; }
@@ -268,7 +265,11 @@ namespace AnotherBulldoze
             checkSprite.spriteName = "check-checked";
 
             checkBox.checkedBoxObject = checkSprite;
-            checkBox.tooltip = String.Format("If checked {0} will be deleted.", text.ToLower());
+            //make sure the test is gramatically correct
+            string txt = " will be deleted.";
+            if (text == "Bridge" || text == "Ground" || text == "Tunnel")
+                txt = " items" + txt;
+            checkBox.tooltip = String.Format("If checked {0} {1}", text.ToLower(), txt);
             label.tooltip = checkBox.tooltip;
             checkBox.isChecked = true;
 
@@ -398,7 +399,6 @@ namespace AnotherBulldoze
             {
                 if (!m_active)
                 {
-
                     while (!Monitor.TryEnter(this.m_dataLock, SimulationManager.SYNCHRONIZE_TIMEOUT))
                     {
                     }
@@ -406,13 +406,11 @@ namespace AnotherBulldoze
                     {
                         this.m_mouseDirection = cameraDirection;
                         this.m_mousePosition = raycastOutput.m_hitPos;
-
                     }
                     finally
                     {
                         Monitor.Exit(this.m_dataLock);
                     }
-
                 }
                 else
                 {
@@ -438,7 +436,6 @@ namespace AnotherBulldoze
 
         protected void BulldozeRoads()
         {
-
             segmentsToDelete = new List<ushort>();
 
             var minX = this.m_startPosition.x < this.m_mousePosition.x ? this.m_startPosition.x : this.m_mousePosition.x;
