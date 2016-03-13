@@ -24,7 +24,7 @@ namespace AnotherBulldoze
         {
             get { return "Another bulldoze Tool"; }
         }
-
+        
         /// <summary>
         /// Global Options
         /// </summary>
@@ -32,47 +32,67 @@ namespace AnotherBulldoze
         public void OnSettingsUI(UIHelperBase helper)
         {
             UIHelperBase group = helper.AddGroup("Another Bulldoze Settings");
-            group.AddCheckbox("Roads", false, RoadsCheck);
-            group.AddCheckbox("Highways", false, HighwaysCheck);
-            group.AddCheckbox("Railroads", false, RailroadsCheck);
-            group.AddCheckbox("Buildings", false, BuildingsCheck);
-            group.AddCheckbox("Trees", false, TreesCheck);
-            group.AddCheckbox("PowerLines", false, PowerLinesCheck);
-            group.AddCheckbox("Pipes", false, PipesCheck);
-            group.AddCheckbox("Props", false, PropsCheck);
+            group.AddGroup("Lines");
+            group.AddCheckbox("Roads", Properties.Settings.Default.Roads, RoadsCheck);
+            group.AddCheckbox("Railroads", Properties.Settings.Default.Railroads, RailroadsCheck);
+            group.AddCheckbox("Highways", Properties.Settings.Default.Highways, HighwaysCheck);
+            group.AddCheckbox("PowerLines", Properties.Settings.Default.PowerLines, PowerLinesCheck);
+            group.AddCheckbox("Pipes", Properties.Settings.Default.Pipes, PipesCheck);
+            group.AddSpace(20);
+            group.AddGroup("Line Options");
+            group.AddCheckbox("Ground", Properties.Settings.Default.Ground, GroundCheck);
+            group.AddCheckbox("Tunnel", Properties.Settings.Default.Tunnel, TunnelCheck);
+            group.AddCheckbox("Bridge", Properties.Settings.Default.Bridge, BridgeCheck);
+            group.AddSpace(20);
+            group.AddGroup("Properties");
+            group.AddCheckbox("Buildings", Properties.Settings.Default.Buildings, BuildingsCheck);
+            group.AddCheckbox("Trees", Properties.Settings.Default.Trees, TreesCheck);
+            group.AddCheckbox("Props", Properties.Settings.Default.Props, PropsCheck);
         }
 
         private void RoadsCheck(bool c)
         {
-            G._Roads = c;
+            Properties.Settings.Default.Roads = c;
         }
         private void RailroadsCheck(bool c)
         {
-            G._Railroads = c;
+            Properties.Settings.Default.Railroads = c;
         }
         private void HighwaysCheck(bool c)
         {
-            G._Highways = c;
+            Properties.Settings.Default.Highways = c;
         }
         private void BuildingsCheck(bool c)
         {
-            G._Buildings = c;
+            Properties.Settings.Default.Buildings = c;
         }
         private void TreesCheck(bool c)
         {
-            G._Trees = c;
+            Properties.Settings.Default.Trees = c;
         }
         private void PowerLinesCheck(bool c)
         {
-            G._PowerLines = c;
+            Properties.Settings.Default.PowerLines = c;
         }
         private void PipesCheck(bool c)
         {
-            G._Pipes = c;
+            Properties.Settings.Default.Pipes = c;
         }
         private void PropsCheck(bool c)
         {
-            G._Props = c;
+            Properties.Settings.Default.Props = c;
+        }
+        private void GroundCheck(bool c)
+        {
+            Properties.Settings.Default.Ground = c;
+        }
+        private void TunnelCheck(bool c)
+        {
+            Properties.Settings.Default.Tunnel = c;
+        }
+        private void BridgeCheck(bool c)
+        {
+            Properties.Settings.Default.Bridge = c;
         }
     }
 

@@ -20,7 +20,13 @@ namespace AnotherBulldoze
 {
     public class AnotherBulldozeTool : DefaultTool
     {
-
+        struct Tunnels
+        {
+            public const int both = 0;
+            public const int tunnel = 1;
+            public const int top = 2;
+        }
+        
         private object m_dataLock = new object();
         
         private bool m_active;
@@ -38,6 +44,9 @@ namespace AnotherBulldoze
         public UIButton mainButton;
         public UIPanel marqueeBulldozePanel;
 
+        private UICheckBox cbGround;
+        private UICheckBox cbTunnel;
+        private UICheckBox cbBridge;
         private UICheckBox cbRoads;
         private UICheckBox cbRailroads;
         private UICheckBox cbHighways;
@@ -54,6 +63,25 @@ namespace AnotherBulldoze
             base.Awake();
         }
 
+        protected override void OnDestroy()
+        {
+            WriteLog("In Distroy");
+            Properties.Settings.Default.Roads = cbRoads.isChecked;
+            Properties.Settings.Default.Railroads = cbRailroads.isChecked;
+            Properties.Settings.Default.Highways = cbHighways.isChecked;
+            Properties.Settings.Default.Buildings = cbBuildings.isChecked;
+            Properties.Settings.Default.Trees = cbTrees.isChecked;
+            Properties.Settings.Default.PowerLines = cbPowerLines.isChecked;
+            Properties.Settings.Default.Props = cbProps.isChecked;
+            Properties.Settings.Default.Pipes = cbPipes.isChecked;
+            Properties.Settings.Default.Ground = cbGround.isChecked;
+            Properties.Settings.Default.Tunnel = cbTunnel.isChecked;
+            Properties.Settings.Default.Bridge = cbBridge.isChecked;
+            Properties.Settings.Default.Save();
+
+            base.OnDestroy();
+        }
+
         public void InitGui(LoadMode mode)
         {
             mainButton = UIView.GetAView().FindUIComponent<UIButton>("MarqueeBulldozer");
@@ -64,7 +92,7 @@ namespace AnotherBulldoze
 
                 mainButton = bulldozeButton.parent.AddUIComponent<UIButton>();
                 mainButton.name = "MarqueeBulldozer";
-                mainButton.size = new Vector2(36, 36);
+                mainButton.size = new Vector2(42, 42);
                 mainButton.tooltip = "Another Bulldozer";
                 mainButton.relativePosition = new Vector2
                 (
@@ -89,7 +117,7 @@ namespace AnotherBulldoze
                 marqueeBulldozePanel.backgroundSprite = "SubcategoriesPanel";
                 marqueeBulldozePanel.isVisible = false;
                 marqueeBulldozePanel.name = "MarqueeBulldozerSettings";
-                marqueeBulldozePanel.size = new Vector2(150, 220);
+                marqueeBulldozePanel.size = new Vector2(150, 350);
 
                 marqueeBulldozePanel.relativePosition = new Vector2
                 (
@@ -98,26 +126,104 @@ namespace AnotherBulldoze
                 );
                 marqueeBulldozePanel.isVisible = true;
 
-                cbRoads = addCheckbox(marqueeBulldozePanel, 20, "Roads");
-                cbRailroads = addCheckbox(marqueeBulldozePanel, 70, "Railroads");
-                cbHighways = addCheckbox(marqueeBulldozePanel, 120, "Highways");
-                cbBuildings = addCheckbox(marqueeBulldozePanel, 45, "Buildings");
-                cbTrees = addCheckbox(marqueeBulldozePanel, 95, "Trees");
-                cbPowerLines = addCheckbox(marqueeBulldozePanel, 195, "PowerLines");
-                cbProps = addCheckbox(marqueeBulldozePanel, 145, "Props");
-                cbPipes = addCheckbox(marqueeBulldozePanel, 170, "Pipes");
+                int top = 1;
+                addUILabel(marqueeBulldozePanel, top, "Lines");
+                top += 25;
+                cbRoads = addCheckbox(marqueeBulldozePanel, top, "Roads");
+                top += 25;
+                cbRailroads = addCheckbox(marqueeBulldozePanel, top, "Railroads");
+                top += 25;
+                cbHighways = addCheckbox(marqueeBulldozePanel, top, "Highways");
+                top += 25;
+                cbPipes = addCheckbox(marqueeBulldozePanel, top, "Pipes");
+                top += 25;
+                cbPowerLines = addCheckbox(marqueeBulldozePanel, top, "PowerLines");
+                top += 25;
+                addUILabel(marqueeBulldozePanel, top, "Options");
+                top += 25;
+                cbGround = addCheckbox(marqueeBulldozePanel, top, "Ground");
+                top += 25;
+                cbTunnel = addCheckbox(marqueeBulldozePanel, top, "Tunnel");
+                top += 25;
+                cbBridge = addCheckbox(marqueeBulldozePanel, top, "Bridge");
+                top += 25;
+                addUILabel(marqueeBulldozePanel, top, "Properties");
+                top += 25;
+                cbBuildings = addCheckbox(marqueeBulldozePanel, top, "Buildings");
+                top += 25;
+                cbTrees = addCheckbox(marqueeBulldozePanel, top, "Trees");
+                top += 25;
+                cbProps = addCheckbox(marqueeBulldozePanel, top, "Props");
+                
+                cbRoads.isChecked = Properties.Settings.Default.Roads;
+                cbRailroads.isChecked = Properties.Settings.Default.Railroads;
+                cbHighways.isChecked = Properties.Settings.Default.Highways;
+                cbBuildings.isChecked = Properties.Settings.Default.Buildings;
+                cbTrees.isChecked = Properties.Settings.Default.Trees;
+                cbPowerLines.isChecked = Properties.Settings.Default.PowerLines;
+                cbProps.isChecked = Properties.Settings.Default.Props;
+                cbPipes.isChecked = Properties.Settings.Default.Pipes;
+                cbGround.isChecked = Properties.Settings.Default.Ground;
+                cbTunnel.isChecked = Properties.Settings.Default.Tunnel;
+                cbBridge.isChecked = Properties.Settings.Default.Bridge;
 
-                cbRoads.isChecked = G._Roads;
-                cbRailroads.isChecked = G._Railroads;
-                cbHighways.isChecked = G._Highways;
-                cbBuildings.isChecked = G._Buildings;
-                cbTrees.isChecked = G._Trees;
-                cbPowerLines.isChecked = G._PowerLines;
-                cbProps.isChecked = G._Props;
-                cbPipes.isChecked = G._Pipes;
+                cbRoads.eventCheckChanged += Roads_Checked;
+                cbRailroads.eventCheckChanged += Railroads_Checked;
+                cbHighways.eventCheckChanged += Highways_Checked;
+                cbBuildings.eventCheckChanged += Buildings_Checked;
+                cbTrees.eventCheckChanged += Trees_Checked;
+                cbPowerLines.eventCheckChanged += PowerLines_Checked;
+                cbProps.eventCheckChanged += Props_Checked;
+                cbPipes.eventCheckChanged += Pipes_Checked;
+                cbGround.eventCheckChanged += Ground_Checked;
+                cbTunnel.eventCheckChanged += Tunnel_Checked;
+                cbBridge.eventCheckChanged += Bridge_Checked;
 
             }
         }
+
+        private void addUILabel(UIPanel panel, int yPos, string text)
+        {
+            UILabel label = panel.AddUIComponent<UILabel>();
+            label.relativePosition = new Vector3(1, yPos);
+            label.height = 0;
+            label.width = 80;
+            label.text = text;
+        }
+
+
+        private void Pipes_Checked(UIComponent component, bool value)
+        { Properties.Settings.Default.Pipes = cbPipes.isChecked; }
+
+        private void Ground_Checked(UIComponent component, bool value)
+        { Properties.Settings.Default.Ground = cbGround.isChecked; }
+
+        private void Tunnel_Checked(UIComponent component, bool value)
+        { Properties.Settings.Default.Tunnel = cbTunnel.isChecked; }
+
+        private void Bridge_Checked(UIComponent component, bool value)
+        { Properties.Settings.Default.Bridge = cbBridge.isChecked; }
+
+        private void Props_Checked(UIComponent component, bool value)
+        { Properties.Settings.Default.Props = cbProps.isChecked; }
+
+        private void PowerLines_Checked(UIComponent component, bool value)
+        { Properties.Settings.Default.PowerLines = cbPowerLines.isChecked; }
+
+        private void Trees_Checked(UIComponent component, bool value)
+        { Properties.Settings.Default.Trees = cbTrees.isChecked; }
+
+        private void Buildings_Checked(UIComponent component, bool value)
+        { Properties.Settings.Default.Buildings = cbBuildings.isChecked; }
+
+        private void Highways_Checked(UIComponent component, bool value)
+        { Properties.Settings.Default.Highways = cbHighways.isChecked; }
+
+        private void Railroads_Checked(UIComponent component, bool value)
+        { Properties.Settings.Default.Railroads = cbRailroads.isChecked; }
+
+        private void Roads_Checked(UIComponent component, bool value)
+        { Properties.Settings.Default.Roads = cbRoads.isChecked; }
 
         void buttonClicked(UIComponent component, UIMouseEventParameter eventParam)
         {
@@ -139,14 +245,13 @@ namespace AnotherBulldoze
 
         private UICheckBox addCheckbox(UIPanel panel, int yPos, string text)
         {
-
             var checkBox = marqueeBulldozePanel.AddUIComponent<UICheckBox>();
             checkBox.relativePosition = new Vector3(20, yPos);
-            checkBox.height = 20;
-            checkBox.width = 20;
-
+            checkBox.height = 0;
+            checkBox.width = 80;
+  
             var label = marqueeBulldozePanel.AddUIComponent<UILabel>();
-            label.relativePosition = new Vector3(45, yPos+3);
+            label.relativePosition = new Vector3(45, yPos + 3);
             checkBox.label = label;
             checkBox.text = text;
             UISprite uncheckSprite = checkBox.AddUIComponent<UISprite>();
@@ -163,7 +268,10 @@ namespace AnotherBulldoze
             checkSprite.spriteName = "check-checked";
 
             checkBox.checkedBoxObject = checkSprite;
+            checkBox.tooltip = String.Format("If checked {0} will be deleted.", text.ToLower());
+            label.tooltip = checkBox.tooltip;
             checkBox.isChecked = true;
+
             return checkBox;
         }
 
@@ -327,11 +435,10 @@ namespace AnotherBulldoze
             }
         }
 
-        /// <summary>
-        /// Updated to handle Roads, RailRoads, highways, Piles and Power lines
-        /// </summary>
+
         protected void BulldozeRoads()
         {
+
             segmentsToDelete = new List<ushort>();
 
             var minX = this.m_startPosition.x < this.m_mousePosition.x ? this.m_startPosition.x : this.m_mousePosition.x;
@@ -343,33 +450,49 @@ namespace AnotherBulldoze
             int gridMinZ = Mathf.Max((int)((minZ - 16f) / 64f + 135f), 0);
             int gridMaxX = Mathf.Min((int)((maxX + 16f) / 64f + 135f), 269);
             int gridMaxZ = Mathf.Min((int)((maxZ + 16f) / 64f + 135f), 269);
-            
+
             for (int i = gridMinZ; i <= gridMaxZ; i++)
             {
                 for (int j = gridMinX; j <= gridMaxX; j++)
                 {
                     ushort num5 = NetManager.instance.m_segmentGrid[i * 270 + j];
                     int num6 = 0;
+                    bool skip = false;
                     while (num5 != 0u)
                     {
                         var segment = NetManager.instance.m_segments.m_buffer[(int)((UIntPtr)num5)];
 
                         Vector3 position = segment.m_middlePosition;
                         float positionDiff = Mathf.Max(Mathf.Max(minX - 16f - position.x, minZ - 16f - position.z), Mathf.Max(position.x - maxX - 16f, position.z - maxZ - 16f));
-                        
-                        if (positionDiff < 0f && segment.Info.name!= "Airplane Path" && segment.Info.name != "Ship Path")
+
+                        if (positionDiff < 0f && segment.Info.name != "Airplane Path" && segment.Info.name != "Ship Path")
                         {
-                            // we are going to handle Roads, RailRoads, highways, Piles and Power lines
-                            if (cbRailroads.isChecked == true && segment.Info.name.Contains("Train") )
+
+                            string seg = segment.Info.name;
+                            // we need to handle Bridges (Elevated, Slope), tunnels, railroads, Pipe, Power Lines, 
+                            if (cbTunnel.isChecked == false && (seg.Contains("Tunnel") || seg.Contains("Slope")))
+                                skip = true;
+                            else if (cbBridge.isChecked == false && (seg.Contains("Elevated") || seg.Contains("Slope")))
+                                skip = true;
+                            else if (cbRoads.isChecked == false && seg.Contains("Road"))
+                                skip = true;
+                            else if (cbRailroads.isChecked == false && seg.Contains("Train"))
+                                skip = true;
+                            else if (cbHighways.isChecked == false && seg.Contains("Highway"))
+                                skip = true;
+                            else if (cbPipes.isChecked == false && seg.Contains("Pipe"))
+                                skip = true;
+                            else if (cbPowerLines.isChecked == false && seg.Contains("Power"))
+                                skip = true;
+                            else if (cbGround.isChecked == false && (seg.Contains("Tunnel") == false && seg.Contains("Slope") == false && seg.Contains("Elevated") == false))
+                                skip = true;
+
+                            WriteLog("Will the segment named, " + segment.Info.name + ", be delected? That is " + skip + ".");
+
+                            if (skip == false)
+                            {
                                 segmentsToDelete.Add(num5);
-                            if (cbRoads.isChecked == true && segment.Info.name.Contains("Road") )
-                                segmentsToDelete.Add(num5);
-                            if (cbHighways.isChecked == true && segment.Info.name.Contains("Highway") )
-                                segmentsToDelete.Add(num5);
-                            if (cbPipes.isChecked == true && segment.Info.name.Contains("Pipe"))
-                                segmentsToDelete.Add(num5);
-                            if (cbPowerLines.isChecked == true && segment.Info.name.Contains("Power"))
-                                segmentsToDelete.Add(num5);
+                            }
                         }
                         num5 = NetManager.instance.m_segments.m_buffer[(int)((UIntPtr)num5)].m_nextGridSegment;
                         if (++num6 >= 262144)
@@ -387,8 +510,6 @@ namespace AnotherBulldoze
             }
             NetManager.instance.m_nodesUpdated = true;
         }
-
-
 
         private IEnumerator ReleaseSegment(ushort segment)
         {
@@ -442,7 +563,7 @@ namespace AnotherBulldoze
             }
 
             foreach(ushort building in buildingsToDelete)
-            {                
+            {
                 SimulationManager.instance.AddAction(this.ReleaseBuilding(building));
             }
         }
@@ -589,6 +710,14 @@ namespace AnotherBulldoze
                     m_active = false;
                 }
             }
+        }
+
+        private void WriteLog(string data)
+        { 
+            // Write the string to a file.
+            System.IO.StreamWriter file = File.AppendText("AnotherBulldozer" + DateTime.Now.ToString("YYYYMMDD") + ".txt");
+            file.WriteLine(data);
+            file.Close();
         }
     }
 }
